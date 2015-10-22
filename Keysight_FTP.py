@@ -4,6 +4,11 @@ Created on Wed Oct  7 15:05:17 2015
 
 @author: brennanless
 """
+#This script is designed to retrieve all formatted data files from the Keysight 34792A mass storage USB device,
+#via FTP. All files will be transferred that are not already located on the local machine's data directory. 
+#Script is designed to handle temporary network outages (<10 min), as well as power outages. 
+
+
 import datetime
 import visa
 import os
