@@ -15,10 +15,16 @@ import datetime
 import visa
 import os
 import sys
+import time
 
 path = '/Users/brennanless/GoogleDrive/Attics_CEC/ErrorLogFiles/'
 os.chdir(path)
-ip_adr = "128.3.22.14" #IP address of the 34792A
+
+#Constructs the visa address outside of the loop, given an IP address. 
+str1 = 'TCPIP0::'
+ip_adr = '128.3.22.197' #IP address of the 34792A
+str2 = '::inst0::INSTR'
+visa_path = str1 + ip_adr + str2
 
 index = 0
 
@@ -32,7 +38,8 @@ for attempt in range(10):
             rm = visa.ResourceManager() #creates VISA resource manager
             
             #Set of Keysight instruments connected via ethernet to BeagleBone. Use other VISA formats for other connectino types. 
-            my_instrument1 = rm.open_resource('TCPIP0::128.3.22.14::inst0::INSTR') #Connects to the instrument
+            #my_instrument1 = rm.open_resource('TCPIP0::128.3.22.14::inst0::INSTR') #Connects to the instrument
+            my_instrument1 = rm.open_resource(visa_path) #Connects to the instrument
             #my_instrument2 = rm.open_resource('TCPIP0::aaa.b.cc.ddd::inst0::INSTR') #Connects to the instrument 2
             #my_instrument3 = rm.open_resource('TCPIP0::aaa.b.cc.ddd::inst0::INSTR') #Connects to the instrument 3
             

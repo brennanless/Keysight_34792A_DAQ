@@ -70,10 +70,17 @@ def last_data_file(local_fileList):
 
 #setting directory path for output files. Change to BBB
 path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
+#path = '/home/bdless/data' #file path for smap-src Linux machine
 os.chdir(path) #sets wd to path string
 
 #tested this loop against failed network connection (unplugged ethernet from 34792A for 2min)
 #tested against last scan file already existing on local file system
+ 
+#Constructs the visa address outside of the loop, given an IP address. 
+str1 = 'TCPIP0::'
+ip_adr = '128.3.22.197' #IP address of the 34792A
+str2 = '::inst0::INSTR'
+visa_path = str1 + ip_adr + str2
 
 index = 0
 
@@ -87,7 +94,8 @@ for attempt in range(10):
             rm = visa.ResourceManager() #creates VISA resource manager
             
             #Set of Keysight instruments connected via ethernet to BeagleBone. Use other VISA formats for other connectino types. 
-            my_instrument1 = rm.open_resource('TCPIP0::128.3.22.14::inst0::INSTR') #Connects to the instrument
+            #my_instrument1 = rm.open_resource('TCPIP0::128.3.22.14::inst0::INSTR') #Connects to the instrument
+            my_instrument1 = rm.open_resource(visa_path) #Connects to the instrument
             #my_instrument2 = rm.open_resource('TCPIP0::aaa.b.cc.ddd::inst0::INSTR') #Connects to the instrument 2
             #my_instrument3 = rm.open_resource('TCPIP0::aaa.b.cc.ddd::inst0::INSTR') #Connects to the instrument 3
             
@@ -110,7 +118,6 @@ for attempt in range(10):
             
             inst_idn = my_instrument1.query("*IDN?").split(",")[2] #Retrieves the instrument number
             mmem_path = "/DATA/" + inst_idn + "/" #Creates the file path on the USB drive
-            ip_adr = "128.3.22.14" #IP address of the 34792A
             local_fileList = os.listdir(path) #lists the files on the local directory
             
             #FTP into the 34792A  
