@@ -17,7 +17,8 @@ import os
 import sys
 import time
 
-path = '/Users/brennanless/GoogleDrive/Attics_CEC/ErrorLogFiles/'
+#path = '/Users/brennanless/GoogleDrive/Attics_CEC/ErrorLogFiles/'
+path = '/home/bdless/ErrorLogFiles/' #file path for smap-src Linux machine
 os.chdir(path)
 
 #Constructs the visa address outside of the loop, given an IP address. 
