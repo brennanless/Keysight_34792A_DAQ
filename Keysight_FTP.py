@@ -69,8 +69,8 @@ def last_data_file(local_fileList):
 #server = smtplib.SMTP("aspmx.l.google.com", 25)
 
 #setting directory path for output files. Change to BBB
-#path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
-path = '/home/bdless/data' #file path for smap-src Linux machine
+path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
+#path = '/home/bdless/data' #file path for smap-src Linux machine
 os.chdir(path) #sets wd to path string
 
 #tested this loop against failed network connection (unplugged ethernet from 34792A for 2min)
@@ -139,7 +139,7 @@ for attempt in range(10):
             try: #calculates largest value for current data files on local directory
                 max_data_file = last_data_file(local_fileList) 
             except ValueError: #if no files are in directory, set max to 0
-                max_data_file = 0
+                max_data_file = [0]
                 #continue
              
             #last_file_time = date_string_to_mins(fileList[len(fileList)-1]) #time value of the latest file on the USB, for comparison to last_scan_time 
