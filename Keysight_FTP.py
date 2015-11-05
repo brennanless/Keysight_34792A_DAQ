@@ -69,8 +69,8 @@ def last_data_file(local_fileList):
 #server = smtplib.SMTP("aspmx.l.google.com", 25)
 
 #setting directory path for output files. Change to BBB
-#path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
-path = '/home/bdless/data' #file path for smap-src Linux machine
+path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
+#path = '/home/bdless/data' #file path for smap-src Linux machine
 os.chdir(path) #sets wd to path string
 
 #tested this loop against failed network connection (unplugged ethernet from 34792A for 2min)
@@ -99,6 +99,8 @@ for attempt in range(10):
             #my_instrument2 = rm.open_resource('TCPIP0::aaa.b.cc.ddd::inst0::INSTR') #Connects to the instrument 2
             #my_instrument3 = rm.open_resource('TCPIP0::aaa.b.cc.ddd::inst0::INSTR') #Connects to the instrument 3
             
+            print "Connected to instrument"
+            
             #last_scan_time = last_scan_string_to_int(my_instrument1.query("syst:time:scan?")) #returns time last scan began
             last_scan_time = my_instrument1.query("syst:time:scan?").encode('ascii', 'ignore').split(",")
             last_scan_time_minutes = 60 * int(last_scan_time[3]) + int(last_scan_time[4])
@@ -113,12 +115,18 @@ for attempt in range(10):
 #                except:
 #                    break            
             
+            print "Performed timing calculations."
+            
             my_instrument1.write("abort")
-            my_instrument1.write("init")            
+            my_instrument1.write("init")  
+            
+            print "sent init and abort commands"          
             
             inst_idn = my_instrument1.query("*IDN?").split(",")[2] #Retrieves the instrument number
             mmem_path = "/DATA/" + inst_idn + "/" #Creates the file path on the USB drive
             local_fileList = os.listdir(path) #lists the files on the local directory
+            
+            print "got instrument id and file paths"
             
             #FTP into the 34792A  
             try:
@@ -128,6 +136,9 @@ for attempt in range(10):
                 #to be reissued for some reason...
                 ftp = FTP(ip_adr)
             ftp.login()
+            
+            print "successful FTP logon"
+            
             ftp.cwd(mmem_path) #naviagate to the file path containing scan directories
             fileList = [] 
             ftp.retrlines("LIST", fileList.append) #list the directories on the USB in mmem_path
@@ -136,12 +147,16 @@ for attempt in range(10):
                 dir_name = parse_directory_str(i)
                 dir_int = date_string_to_int(dir_name)
                 fileList_ints.append(dir_int)
+                
+            print "created file list of integers"
+                	
             try: #calculates largest value for current data files on local directory
                 max_data_file = last_data_file(local_fileList) 
             except ValueError: #if no files are in directory, set max to 0
                 max_data_file = [0]
                 #continue
-             
+            print "max_data_file set to 0"
+            
             #last_file_time = date_string_to_mins(fileList[len(fileList)-1]) #time value of the latest file on the USB, for comparison to last_scan_time 
 #            if (last_scan_time[0] - fileList_ints[len(fileList_ints)-1][0]) < 10000:
 #                my_instrument1.write("init")                
@@ -153,24 +168,37 @@ for attempt in range(10):
             data_files_to_get = []    
             for i in range(len(fileList_ints)): #Boolean values indicating if files on USB are later than the lates file on the local drive
                 data_files_to_get.append(max_data_file[0] >= fileList_ints[i][0])
+                
+            print "got boolean values indicating which files to get"
+                
             fileList_to_get = []              
             for i in range(len(fileList)): #Assembles list of directories that are not on local drive
                 if data_files_to_get[i] == False:
                     fileList_to_get.append(fileList[i])
                 else:
                     continue
+                    
+            print "created list of files to get"
+                    
             for i in range(len(fileList_to_get)-1): #works thrtough the directories and downloads each file to local drive
                 scan_directory_name = parse_directory_str(fileList_to_get[i])
+                print scan_directory_name
                 ftp.cwd(scan_directory_name)
                 local_file = scan_directory_name + "_dat00001.csv"
+                print local_file
                 if any(local_file in s for s in local_fileList):
                     os.remove(local_file)
                 local_filename = os.path.join(path, local_file) 
-                #print local_filename
+                print local_filename
                 lf = open(local_filename, "wb")
+                print "local file opened"
                 ftp.retrbinary("RETR " + "dat00001.csv", lf.write)
+                print "retrieved data and wrote to local file."
                 lf.close()
                 ftp.cwd("..")
+                
+            print "successfully retrieved files"    
+                
             #close out ftp, instrument and resource manager connections
             ftp.quit()
             my_instrument1.close() #close the instrument
