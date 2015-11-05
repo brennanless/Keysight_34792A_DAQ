@@ -69,8 +69,8 @@ def last_data_file(local_fileList):
 #server = smtplib.SMTP("aspmx.l.google.com", 25)
 
 #setting directory path for output files. Change to BBB
-path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
-#path = '/home/bdless/data' #file path for smap-src Linux machine
+#path = '/Users/brennanless/GoogleDrive/Attics_CEC/TestDataFiles'
+path = '/home/bdless/data' #file path for smap-src Linux machine
 os.chdir(path) #sets wd to path string
 
 #tested this loop against failed network connection (unplugged ethernet from 34792A for 2min)
